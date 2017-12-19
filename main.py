@@ -1,7 +1,15 @@
 import itertools as iter
 import numpy as np
+import time
 
-def compare(a1,a2,a6_dict):
+
+def compare1(a1,a6_dict):
+    for i in a1:
+        if a6_dict.get(i) is not None:
+            return True
+    return False
+
+def compare2(a1,a2,a6_dict):
     for i in a1:
         if a6_dict.get(i) is not None:
             for j in a2:
@@ -20,6 +28,7 @@ if __name__ == "__main__":
 
 
 def main():
+    
     odd = list(iter.combinations(range(1,50,2),4))
     even = list(iter.combinations(range(2,49,2),4))
     winner_number_raw = input('Please input the winner number: \n').split(',') # make string array to int 
@@ -28,12 +37,17 @@ def main():
     winner_number_dict = make_dict(winner_number)   # make winner number bucket 
 
     # making combination test of odd and even
+    time0 = time.clock()
+    com_num = len(odd)*len(even)
+    combination_data = np.array([False]*com_num,np.bool)
 
-    combination_data = np.array([],np.bool)
-
+    flag = 0
     for i in odd:
         for j in even:
-            combination_data = np.append(combination_data,compare(i,j,winner_number_dict))
-    
+            combination_data[flag] = compare2(i,j,winner_number_dict)
+            flag += 1
 
 
+    time2 = time.clock() - time0
+
+    print('The time elasped: ' + str(time2) + ' seconds')
