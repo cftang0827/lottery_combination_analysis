@@ -72,11 +72,11 @@ def make_numpy_file(winner_number_dict, start_name, odd, even):
 
     for ii in (range(0, len(winner_number_dict))):
         file_name = str(ii+int(start_name)) + '.data'
-#         print('計算檔案: ' + file_name + ' 中...')
+        print('計算檔案: ' + file_name + ' 中...')
         # combination_data = np.array([False]*com_num,np.bool)
         combination_data = [False] * com_num
         flag = 0
-        for i in tqdm(odd):
+        for i in tqdm(odd, ascii=True):
             for j in even:
                 combination_data[flag] = compare2(i, j, winner_number_dict[ii])
                 flag += 1
