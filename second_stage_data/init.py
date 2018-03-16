@@ -5,8 +5,8 @@ import os
 
 def main():
 	print('初始化...')
-	odd = list(iter.combinations(range(1,11,2),4))
-	even = list(iter.combinations(range(2,10,2),4))
+	odd = list(iter.combinations(range(1,50,2),4))
+	even = list(iter.combinations(range(2,49,2),4))
 	com_num = int(len(odd)*len(even))  
 	base_array = np.array([0]*com_num)
 	overall_dict = np.array([0]*com_num)
