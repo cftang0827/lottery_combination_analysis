@@ -3,6 +3,7 @@ import numpy as np
 import time
 import sys
 import os
+from compare3 import compare3
 from tqdm import tqdm
 
 
@@ -78,7 +79,7 @@ def make_numpy_file(winner_number_dict, start_name, odd, even):
         flag = 0
         for i in tqdm(odd, ascii=True):
             for j in even:
-                combination_data[flag] = compare2(i, j, winner_number_dict[ii])
+                combination_data[flag] = compare3(i, j, winner_number_dict[ii])
                 flag += 1
 #         print('製作檔案 ' + file_name + '中.....')
         try:
