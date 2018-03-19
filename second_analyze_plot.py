@@ -5,7 +5,7 @@ import time
 import sys
 import os
 from tqdm import tqdm
-import analyze_second
+from analyze_second import analyze_second
 
 
 data = list(np.array([0]*49, dtype=np.int8))
