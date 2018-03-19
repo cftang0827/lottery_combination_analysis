@@ -1,4 +1,3 @@
-
 cimport cython
 cimport numpy as np
 ctypedef np.long DTYPE_t
