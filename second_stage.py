@@ -21,7 +21,7 @@ def main():
         exit()
     end_array = np.array([True]*com_num, dtype=np.int)
     start_time = time.clock()
-    for ii in tqdm(range(load_file_name_first,load_file_name_last+1)):
+    for ii in tqdm(range(load_file_name_first,load_file_name_last+1), ascii=True):
         print("正在分析第 {} 期數資料: {}.data...".format(str(ii),str(ii)) )
         try:
             f_read = open(os.path.join('data',str(ii)) + ".data", "rb")
