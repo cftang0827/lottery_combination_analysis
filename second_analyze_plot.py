@@ -16,6 +16,14 @@ try:
     npz_data = (np.load(os.path.join('second_stage_data/','base_array_{}.npz'.format(str(num2analyze))))['data'])
 
     hist_data = np.histogram(npz_data, bins=range(0, int(num2analyze)+2))
+
+    f = open('second_analyze_data_{}.txt'.format(num2analyze) ,'w')
+    f.write('#1 \n\n\n\n\n')
+    for index, dat in enumerate(hist_data[0]):
+        f.write('{} --> {}\n'.format(index, dat))
+
+    f.write('End \n\n\n\n\n')
+
     while True:
         analyse_range = input('請輸入想要分析的範圍: (min-max: {}-{})/離開請按q  '.format(0, int(num2analyze))).split('-')
         if analyse_range == ['q']:
@@ -34,8 +42,8 @@ try:
                     plt.xlabel('Range {}-{}'.format(range_front, range_back-1))
                     plt.ylabel('Combination number count')   
                     plt.bar(np.arange(range_front,range_back), hist_data[0][range_front:range_back])
-                    for i, v in enumerate(hist_data[0][range_front:range_back]):
-                        ax.text(i, v + 5, '{}'.format(i), color='blue', fontweight='bold')
+                    # for i, v in enumerate(hist_data[0][range_front:range_back]):
+                    #     ax.text(i, v + 5, '{}'.format(i), color='blue', fontweight='bold')
                     plt.show()
                     # plt.cla()
                     # plt.clf()
@@ -70,10 +78,17 @@ try:
         plt.xlabel('Lotter number {}-{}'.format(1, 49))
         plt.ylabel('Combination number count')   
         plt.bar(np.arange(1,50), chart)
-        for i, v in enumerate(chart):
-            ax.text(i, v + 5, '{}'.format(i), color='blue', fontweight='bold')
-        plt.show()        
 
+        f.write('#2 number: {}\n\n'.format(analyse_vacancy))
+        for index, dat in enumerate(chart):
+            f.write('{} --> {} \n'.format(index+1, dat))
+
+        f.write('\n')
+ 
+        # for i, v in enumerate(chart):
+        #     ax.text(i, v + 5, '{}'.format(i), color='blue', fontweight='bold')
+        plt.show()        
+    f.close()
 
 
 except IOError:
