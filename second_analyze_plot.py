@@ -31,7 +31,7 @@ try:
                     range_back = int(analyse_range[1])+1
 
                     fig, ax = plt.subplots() 
-                    plt.xlabel('Range {}-{}'.format(range_front, range_back))
+                    plt.xlabel('Range {}-{}'.format(range_front, range_back-1))
                     plt.ylabel('Combination number count')   
                     plt.bar(np.arange(range_front,range_back), hist_data[0][range_front:range_back])
                     for i, v in enumerate(hist_data[0][range_front:range_back]):
