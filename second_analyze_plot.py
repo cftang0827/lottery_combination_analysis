@@ -37,8 +37,8 @@ try:
                     for i, v in enumerate(hist_data[0][range_front:range_back]):
                         ax.text(i, v + 5, '{}'.format(i), color='blue', fontweight='bold')
                     plt.show()
-                    plt.cla()
-                    plt.clf()
+                    # plt.cla()
+                    # plt.clf()
                 except ValueError:
                     print('請檢查您輸入的範圍是否超過總期數, again')
                     continue
