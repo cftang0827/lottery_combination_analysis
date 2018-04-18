@@ -5,7 +5,11 @@ import sys
 import os
 from compare3 import compare3
 from tqdm import tqdm
+import multiprocessing as mp 
 
+odd = list(iter.combinations(range(1,50,2),4))
+even = list(iter.combinations(range(2,49,2),4))
+com_num = len(odd)*len(even)
 
 def compare1(a1,a6_dict):
     for i in a1:
@@ -60,8 +64,51 @@ def make_winner_dict_list(winner_number):
 
     return winner_num_dict
 
-def make_numpy_file(winner_number_dict, start_name, odd, even):
-    com_num = len(odd)*len(even)
+def cal_single(ii, start_name, winner_number_dict):
+    file_name = str(ii+int(start_name)) + '.data'
+    print('計算檔案: ' + file_name + ' 中...')
+    # combination_data = np.array([False]*com_num,np.bool)
+    combination_data = [False] * com_num
+    flag = 0
+    for i in tqdm(odd, ascii=True):
+        for j in even:
+            combination_data[flag] = compare3(i, j, winner_number_dict[ii])
+            flag += 1
+#         print('製作檔案 ' + file_name + '中.....')
+    try:
+        f = open(os.path.join('data',file_name),'wb')
+        combination_data_np = np.array(combination_data)
+        # print(combination_data)
+        np.save(f,combination_data_np)
+#             print('存檔，檔名為: ' + file_name + '，存檔成功')
+    except:
+        print('[錯誤3] 存檔錯誤，跳過本檔案，請重新操作')
+        sys.exit(0)
+
+def cal_multi(ii, start_name, winner_number_dict):
+    file_name = str(ii+int(start_name)) + '.data'
+    print('計算檔案: ' + file_name + ' 中...')
+    # combination_data = np.array([False]*com_num,np.bool)
+    combination_data = [False] * com_num
+    flag = 0
+    for i in (odd):
+        for j in even:
+            combination_data[flag] = compare3(i, j, winner_number_dict[ii])
+            flag += 1
+#         print('製作檔案 ' + file_name + '中.....')
+    try:
+        f = open(os.path.join('data',file_name),'wb')
+        combination_data_np = np.array(combination_data)
+        # print(combination_data)
+        np.save(f,combination_data_np)
+#             print('存檔，檔名為: ' + file_name + '，存檔成功')
+    except:
+        print('[錯誤3] 存檔錯誤，跳過本檔案，請重新操作')
+        sys.exit(0)
+
+
+def make_numpy_file(winner_number_dict, start_name, odd, even, multiprocess_number):
+    
     if os.path.isdir('data') == False:
         print('無法存取data資料夾，重新建立data資料夾')
         try:
@@ -71,26 +118,28 @@ def make_numpy_file(winner_number_dict, start_name, odd, even):
             sys.exit(0)
     # calculate every combination
 
-    for ii in (range(0, len(winner_number_dict))):
-        file_name = str(ii+int(start_name)) + '.data'
-        print('計算檔案: ' + file_name + ' 中...')
-        # combination_data = np.array([False]*com_num,np.bool)
-        combination_data = [False] * com_num
-        flag = 0
-        for i in tqdm(odd, ascii=True):
-            for j in even:
-                combination_data[flag] = compare3(i, j, winner_number_dict[ii])
-                flag += 1
-#         print('製作檔案 ' + file_name + '中.....')
-        try:
-            f = open(os.path.join('data',file_name),'wb')
-            combination_data_np = np.array(combination_data)
-            # print(combination_data)
-            np.save(f,combination_data_np)
-#             print('存檔，檔名為: ' + file_name + '，存檔成功')
-        except:
-            print('[錯誤3] 存檔錯誤，跳過本檔案，請重新操作')
-            sys.exit(0)
+   
+
+    for ii in (range(0, len(winner_number_dict),multiprocess_number)):
+        p_list = list()
+        p_number = multiprocess_number
+        if p_number > 1:
+            for pp in range(p_number):
+                if ii + pp < len(winner_number_dict):
+                    pro = mp.Process(target=cal_multi, args=(ii+pp, start_name, winner_number_dict))
+                    p_list.append(pro)
+            # cal(ii, start_name, winner_number_dict)
+            print(p_list)
+            print('================')
+            for ps in p_list:
+                ps.start()
+            
+            for ps in p_list:
+                ps.join()
+            print('=== Finished ===')
+        else:
+            cal_single(ii, start_name, winner_number_dict)
+        
 
 def get_winner_number_from_file(file_name):
     try:
@@ -119,18 +168,18 @@ def get_winner_number_from_input():
 def mode_1():
     # odd = list(iter.combinations(range(1,50,2),4))
     # even = list(iter.combinations(range(2,49,2),4))
-    odd = list(iter.combinations(range(1,50,2),4))
-    even = list(iter.combinations(range(2,49,2),4))
+
     input_file_name = input('請輸入包含正確格式的開獎號碼檔案名稱: ')
     print('開啟檔案 ' + input_file_name + " ......")
     winner_number = get_winner_number_from_file(input_file_name)
     print('開啟檔案 ' + input_file_name + " 成功......")
     start_name = input('請輸入檔案第一期的期數: ')
+    multiprocess_number = int(input('請輸入計算核心數量: '))
     winner_number_dict_list = make_winner_dict_list(winner_number)
 
     # making combination test of odd and even
     time0 = time.clock()
-    make_numpy_file(winner_number_dict_list, start_name, odd, even)
+    make_numpy_file(winner_number_dict_list, start_name, odd, even, multiprocess_number)
     time2 = time.clock() - time0
     print('本次計算時間: ' + str(time2) + ' 秒')
     ex = input('請按Enter結束')
