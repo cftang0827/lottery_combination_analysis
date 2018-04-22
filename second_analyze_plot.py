@@ -8,6 +8,8 @@ import sys
 import os
 from tqdm import tqdm
 
+from second_analyze_plot_combination import secode_plot as sa
+
 
 data = list(np.array([0]*49, dtype=np.int8))
 num2analyze = input('請輸入您想要分析第幾期的資料: ')
@@ -23,6 +25,7 @@ try:
         f.write('{} --> {}\n'.format(index, dat))
 
     f.write('End \n\n\n\n\n')
+    f.flush()
 
     while True:
         analyse_range = input('請輸入想要分析的範圍: (min-max: {}-{})/離開請按q  '.format(0, int(num2analyze))).split('-')
@@ -63,17 +66,19 @@ try:
             continue
 
         num = 0
-        chart = np.zeros(49, dtype=np.int64)
+        chart_input = np.zeros(49, dtype=np.int64)
         target = int(analyse_vacancy)
-        for ii in tqdm(odd, ascii=True):
-            for jj in even:
-                if npz_data[num] == target:
-                    for i in ii:
-                        chart[i-1] += 1
-                    for j in jj:
-                        chart[j-1] += 1
-                num += 1
-        print('Complete')
+
+        chart = sa(odd, even, target, chart_input, npz_data)
+        # for ii in tqdm(odd, ascii=True):
+        #     for jj in even:
+        #         if npz_data[num] == target:
+        #             for i in ii:
+        #                 chart[i-1] += 1
+        #             for j in jj:
+        #                 chart[j-1] += 1
+        #         num += 1
+        # print('Complete')
         fig, ax = plt.subplots() 
         plt.xlabel('Lotter number {}-{}'.format(1, 49))
         plt.ylabel('Combination number count')   
@@ -84,6 +89,7 @@ try:
             f.write('{} --> {} \n'.format(index+1, dat))
 
         f.write('\n')
+        f.flush()
  
         # for i, v in enumerate(chart):
         #     ax.text(i, v + 5, '{}'.format(i), color='blue', fontweight='bold')
