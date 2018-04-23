@@ -10,19 +10,36 @@ from tqdm import tqdm
 
 from second_analyze_plot_combination import secode_plot as sa
 
+odd = (list(iter.combinations(range(1,50,2),4)))
+even = (list(iter.combinations(range(2,49,2),4)))
 
 data = list(np.array([0]*49, dtype=np.int8))
 num2analyze = input('請輸入您想要分析第幾期的資料: ')
+
+chart_list = {}
 try:
     print('讀取資料中...')
     npz_data = (np.load(os.path.join('second_stage_data/','base_array_{}.npz'.format(str(num2analyze))))['data'])
 
     hist_data = np.histogram(npz_data, bins=range(0, int(num2analyze)+2))
-
-    f = open('second_analyze_data_{}.txt'.format(num2analyze) ,'w')
-    f.write('#1 \n\n\n\n\n')
-    for index, dat in enumerate(hist_data[0]):
+    if os.path.isdir('second_output') is False:
+        print('找不到 second_output 資料夾, 建立新資料夾..')
+        os.mkdir('second_output')
+    f = open(os.path.join('second_output','second_analyze_data_{}.dat'.format(num2analyze)) ,'w', 1)
+    f.write('#1 First part\n\n\n')
+    for index, dat in enumerate(tqdm(hist_data[0], ascii=True)):
+        chart_input = np.zeros(49, dtype=np.int64)
         f.write('{} --> {}\n'.format(index, dat))
+        if dat > 0:
+            chart = sa(odd, even, index, chart_input, npz_data)
+            chart_list[index] = chart
+            non_zero = np.transpose(np.argwhere(chart>0))+1
+        else:
+            non_zero = []
+        f.write('The including number: ')
+        f.write(str(non_zero))
+        f.write('\n\n')
+        f.flush()
 
     f.write('End \n\n\n\n\n')
     f.flush()
@@ -53,8 +70,7 @@ try:
                 except ValueError:
                     print('請檢查您輸入的範圍是否超過總期數, again')
                     continue
-    odd = (list(iter.combinations(range(1,50,2),4)))
-    even = (list(iter.combinations(range(2,49,2),4)))
+
     while True:
         analyse_vacancy = input('請輸入想要分析的連續未開數: (min: {}/ max: {})/離開請按q  '.format(0, int(num2analyze)))
         
@@ -69,7 +85,8 @@ try:
         chart_input = np.zeros(49, dtype=np.int64)
         target = int(analyse_vacancy)
 
-        chart = sa(odd, even, target, chart_input, npz_data)
+        # chart = sa(odd, even, target, chart_input, npz_data)
+        chart = chart_list.get(target)
         # for ii in tqdm(odd, ascii=True):
         #     for jj in even:
         #         if npz_data[num] == target:
@@ -79,14 +96,20 @@ try:
         #                 chart[j-1] += 1
         #         num += 1
         # print('Complete')
-        fig, ax = plt.subplots() 
-        plt.xlabel('Lotter number {}-{}'.format(1, 49))
-        plt.ylabel('Combination number count')   
-        plt.bar(np.arange(1,50), chart)
+        if chart is not None:
+            fig, ax = plt.subplots() 
+            plt.xlabel('Lotter number {}-{}'.format(1, 49))
+            plt.ylabel('Combination number count')   
+            plt.bar(np.arange(1,50), chart)
 
-        f.write('#2 number: {}\n\n'.format(analyse_vacancy))
-        for index, dat in enumerate(chart):
-            f.write('{} --> {} \n'.format(index+1, dat))
+            f.write('#2 number: {}\n\n'.format(analyse_vacancy))
+            for index, dat in enumerate(chart):
+                f.write('{} --> {} \n'.format(index+1, dat))
+                f.flush()
+        else:
+            print('沒有數字, 不畫圖, 跳過')
+            f.write('#2 number: {} --> No number, skip! \n\n'.format(analyse_vacancy))
+            f.flush()
 
         f.write('\n')
         f.flush()
