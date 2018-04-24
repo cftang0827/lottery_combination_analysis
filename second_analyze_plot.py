@@ -35,7 +35,8 @@ try:
             chart_list[index] = chart
             non_zero = np.transpose(np.argwhere(chart>0))+1
         else:
-            non_zero = []
+            non_zero = [[]]
+        f.write('The total number count: {}\n'.format(len(non_zero[0])))
         f.write('The including number: ')
         f.write(str(non_zero))
         f.write('\n\n')
